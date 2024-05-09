@@ -29,19 +29,25 @@ export default function StarRating({
   size = "1.5em",
   gap = 0,
   message = [],
+  onSetRating,
+  defaultvalue = 0,
 }) {
   const starContainerStyle = {
     display: "flex",
     gap: gap + "em",
   };
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(defaultvalue);
+  function handleRating(rating) {
+    setRating(rating);
+    onSetRating(rating);
+  }
   return (
     <div style={containerStyle}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             isFill={i + 1 <= rating ? true : false}
-            onChange={setRating}
+            onChange={handleRating}
             value={i + 1}
             key={i}
             color={color}

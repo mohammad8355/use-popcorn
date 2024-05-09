@@ -61,6 +61,32 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedId, setSelectedID] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  function AddWatchedHandle(newwatched) {
+    if (
+      watched.filter((watchedItem) => watchedItem.imdbID === newwatched.imdbID)
+        .length != 0
+    ) {
+      console.log("edit watched");
+      setWatched((watched) =>
+        watched.map((watchItem) =>
+          watchItem.imdbID === newwatched.imdbID
+            ? { ...watchItem, userRating: newwatched.userRating }
+            : watchItem
+        )
+      );
+      alert("successfully edit watched");
+    } else {
+      watched.push(newwatched);
+      console.log("added new watched");
+      setWatched(watched);
+      alert("successfully added new watched");
+    }
+  }
+  function IsExist(imdbID) {
+    return (
+      watched.filter((watchedItem) => watchedItem.imdbID === imdbID).length != 0
+    );
+  }
   useEffect(
     function () {
       async function fetchdata() {
@@ -69,7 +95,7 @@ export default function App() {
           setIsLoading(true);
           const apiUrl = url + "&S=" + query;
           const res = await fetch(apiUrl);
-          console.log(apiUrl);
+          // console.log(apiUrl);
           if (!res.ok) {
             throw new Error("Some thing went wrong to fetching data");
           }
@@ -106,6 +132,7 @@ export default function App() {
             throw new Error("some thing went wrong");
           }
           const data = await res.json();
+          // console.log(data);
           setIsLoading(false);
           if (data.Response === "False")
             throw new Error("selected movie not found");
@@ -139,9 +166,9 @@ export default function App() {
               movie={selectedMovie}
               setId={setSelectedID}
               setSelectedMovie={setSelectedMovie}
-            >
-              <StarRating gap={0.1} />
-            </MovieDetail>
+              addWatched={AddWatchedHandle}
+              IsExist={IsExist}
+            ></MovieDetail>
           )}
           {!selectedId && !selectedMovie && !error && !isLoading && (
             <>
@@ -246,11 +273,19 @@ function Movie({ movie, onChange }) {
     </li>
   );
 }
-function MovieDetail({ movie, children, setId, setSelectedMovie }) {
+function MovieDetail({ movie, setId, setSelectedMovie, addWatched, IsExist }) {
+  const [userRate, setUseRate] = useState(0);
   function handleBack() {
     setId(null);
     setSelectedMovie(null);
   }
+  useEffect(function () {
+    document.title = "MOVIE:" + movie.Title;
+    return function () {
+      document.title = "POPCORN";
+    };
+  }, []);
+  // console.log(isNAN(Number(movie.Runtime.substr(0, 3))));
   return (
     <div className=" details">
       <button className="btn-back" onClick={handleBack}>
@@ -269,7 +304,30 @@ function MovieDetail({ movie, children, setId, setSelectedMovie }) {
         </div>
       </header>
       <section>
-        <div className="rating">{children}</div>
+        <div className="rating">
+          <StarRating gap={0.1} onSetRating={setUseRate} defaultvalue={5} />
+          <button
+            className="btn-add"
+            onClick={() =>
+              addWatched({
+                imdbID: movie.imdbID,
+                Title: movie.Title,
+                Year: movie.Year,
+                Poster: movie.Poster,
+                runtime:
+                  movie.Runtime.substr(0, 3) != "N/A"
+                    ? Number(movie.Runtime.substr(0, 3))
+                    : 0,
+                imdbRating: movie.imdbRating,
+                userRating: userRate,
+              })
+            }
+          >
+            {IsExist(movie.imdbID)
+              ? "Edit Watched movie"
+              : "Add To Watched List"}
+          </button>
+        </div>
         <p>{movie.Plot}</p>
         <h5>Directed By {movie.Director}</h5>
       </section>
@@ -279,8 +337,12 @@ function MovieDetail({ movie, children, setId, setSelectedMovie }) {
 //MovieList Component ==> Include Movie Component
 //BoxMovie Component ==> Include MovieList Component
 function SummeryMovie({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
+  const avgImdbRating = Math.round(
+    average(watched.map((movie) => movie.imdbRating))
+  );
+  const avgUserRating = Math.round(
+    average(watched.map((movie) => movie.userRating))
+  );
   const avgRuntime = average(watched.map((movie) => movie.runtime));
   return (
     <div className="summary">
