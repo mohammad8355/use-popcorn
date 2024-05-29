@@ -21,6 +21,8 @@ html {
 }
 
 body {
+  width: 100%;
+  min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
@@ -32,11 +34,12 @@ body {
 /* ******* */
 
 .nav-bar {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  justify-content: space-evenly;
   align-items: center;
-  height: 7.2rem;
-  padding: 0 3.2rem;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  padding: 1em;
   background-color: var(--color-primary);
   border-radius: 0.9rem;
 }
@@ -337,6 +340,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+@media screen And (max-width: 827px) {
+  .main {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .box {
+    width: 100%;
+    min-height: 10em;
+  }
 }
 
 /*
