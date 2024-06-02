@@ -6,7 +6,7 @@ import { useMovies } from "./useMovies";
 import { useLocalStorageState } from "./useLocalStorageState";
 import { useKey } from "./useKey";
 
-const url = "http://www.omdbapi.com/?apikey=a42e75d0";
+const url = "https://www.omdbapi.com/?apikey=a42e75d0";
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
